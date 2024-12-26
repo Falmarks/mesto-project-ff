@@ -11,7 +11,7 @@ function createCard(cardInformation){
     const cardImage = cardElement.querySelector('.card__image');
     cardImage.src = cardInformation.link;
     cardImage.alt = cardInformation.name;
-    cardElement.querySelector('.card__description').textContent = cardInformation.link;
+    cardElement.querySelector('.card__title').textContent = cardInformation.name;
     cardDeleteButton.addEventListener('click', removeCard);
     return cardElement;
 };
