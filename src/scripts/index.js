@@ -71,13 +71,15 @@ popupNewCardForm.addEventListener('submit', (element) => {
     closeModal(popupNewCard);
     popupNewCardForm.reset();
 })
+
 // Функция открытия картинок карточек
-const imageOpenPopup = (cardImage) => {
-    popupImage.src = cardImage.src;
-    popupImage.alt = cardImage.alt;
-    popupCaption.textContent = cardImage.alt;
+const imageOpenPopup = (element) => {
+    popupImage.src = element.link;
+    popupImage.alt = element.name;
+    popupCaption.textContent = element.name;
     openModal(popupImageType);
 };
+
 // Функция создания карточки
 function createCard(cardInfo, imageHandler, likeHandler, deleteHandler) {
     const cardElement = cardsTemplate.querySelector('.card').cloneNode(true);
@@ -90,7 +92,7 @@ function createCard(cardInfo, imageHandler, likeHandler, deleteHandler) {
     likeButton.addEventListener('click', likeHandler);
     cardDeleteButton.addEventListener('click', deleteHandler);
     cardImage.addEventListener('click', () => {
-        imageHandler(cardImage)
+        imageHandler(cardInfo)
     });
     return cardElement;
 };
