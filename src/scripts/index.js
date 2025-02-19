@@ -1,19 +1,18 @@
 // Импорты
 import '../pages/index.css';
 import {
-    initialCards,
+    initialCards
 } from './cards';
 import {
     likeCard,
-    deleteCard
+    deleteCard,
+    createCard
 } from './card';
 import {
     openModal,
     closeModal
 } from './modal';
 
-// Темплейт карточки
-const cardsTemplate = document.querySelector('#card-template').content;
 // DOM узлы
 const cardsContainer = document.querySelector('.places__list');
 const profileEditButton = document.querySelector('.profile__edit-button');
@@ -73,28 +72,11 @@ popupNewCardForm.addEventListener('submit', (element) => {
 })
 
 // Функция открытия картинок карточек
-const imageOpenPopup = (element) => {
-    popupImage.src = element.link;
-    popupImage.alt = element.name;
-    popupCaption.textContent = element.name;
+const imageOpenPopup = (link, name) => {
+    popupImage.src = link;
+    popupImage.alt = name;
+    popupCaption.textContent = name;
     openModal(popupImageType);
-};
-
-// Функция создания карточки
-function createCard(cardInfo, imageHandler, likeHandler, deleteHandler) {
-    const cardElement = cardsTemplate.querySelector('.card').cloneNode(true);
-    const cardDeleteButton = cardElement.querySelector('.card__delete-button')
-    const likeButton = cardElement.querySelector('.card__like-button');
-    const cardImage = cardElement.querySelector('.card__image');
-    cardImage.src = cardInfo.link;
-    cardImage.alt = cardInfo.name;
-    cardElement.querySelector('.card__title').textContent = cardInfo.name;
-    likeButton.addEventListener('click', likeHandler);
-    cardDeleteButton.addEventListener('click', deleteHandler);
-    cardImage.addEventListener('click', () => {
-        imageHandler(cardInfo)
-    });
-    return cardElement;
 };
 
 // Функция отрисовки новых карточек на страницу
