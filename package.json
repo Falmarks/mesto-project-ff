@@ -1,15 +1,15 @@
 {
   "name": "mesto-project-ff",
   "version": "1.0.0",
-  "main": "babel.config.js",
+  "main": "index.js",
   "scripts": {
-    "build": "webpack --mode production --watch",
-    "dev": "webpack serve --watch",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+  "build": "webpack --mode production",
+  "dev": "webpack serve --open",
+  "predeploy": "npm run build",
+  "deploy": "gh-pages -d dist"
   },
   "keywords": [],
-  "author": "",
+  "author": "Falmark",
   "license": "ISC",
   "description": "",
   "devDependencies": {

@@ -1,9 +1,6 @@
 // Импорты
 import '../pages/index.css';
 import {
-    initialCards
-} from './cards';
-import {
     likeCard,
     deleteCard,
     createCard
@@ -12,27 +9,67 @@ import {
     openModal,
     closeModal
 } from './modal';
+import {
+    enableValidation, 
+    clearValidation,
+    toggleButtonState  
+} from './validation';
+import {
+    getCards, updateUserAvatar, getUserInfo, deleteCardUser, postNewCard, patchUserInfo
+} from './api';
 
 // DOM узлы
 const cardsContainer = document.querySelector('.places__list');
+const profileAvatar = document.querySelector('.profile__image');
 const profileEditButton = document.querySelector('.profile__edit-button');
-const popupEditProfile = document.querySelector('.popup_type_edit');
 const profileTitle = document.querySelector('.profile__title');
 const profileDescription = document.querySelector('.profile__description');
 const newCardAddButton = document.querySelector('.profile__add-button');
+const popupEditProfile = document.querySelector('.popup_type_edit');
 const popupNewCard = document.querySelector('.popup_type_new-card');
 const popupCaption = document.querySelector('.popup__caption');
 const popupImage = document.querySelector('.popup__image');
 const popupImageType = document.querySelector('.popup_type_image');
 const popupFormProfile = document.forms['edit-profile'];
 const popupNewCardForm = document.forms['new-place'];
+const config = {
+    formSelector: '.popup__form',
+    inputSelector: '.popup__input',
+    submitButtonSelector: '.popup__button',
+    inactiveButtonClass: 'popup__button_disabled',
+    inputErrorClass: 'popup__input_type_error',
+    errorClass: 'popup__error_visible'
+  }
+let userId='';
+
+// Активация валидирования
+enableValidation(config); 
 
 // Слушатель + Функция открытия попапа редактирования профиля
 profileEditButton.addEventListener('click', () => {
+    clearValidation(popupFormProfile, config)
     popupFormProfile.name.value = profileTitle.textContent;
     popupFormProfile.description.value = profileDescription.textContent;
     openModal(popupEditProfile);
+    toggleButtonState(popupFormProfile, config);
 });
+
+
+// Слушатель открытия формы смены автара
+
+profileAvatar.addEventListener('click', () => {
+    clearValidation()
+    openModal();
+});
+
+// Функция идентификации пользователя
+function setUserInfo(user) {
+    profileTitle.textContent = user.name;
+    profileDescription.textContent = user.about;
+    profileAvatar.setAttribute('style', `background-image: url('${user.avatar}'`);
+    userId = user._id;
+};
+
 
 // Слушатель отправки формы попапа редактирования профиля + изменение информации на странице
 popupFormProfile.addEventListener('submit', (element) => {
@@ -55,6 +92,8 @@ modals.forEach((modal) => {
 // Слушатель + функция открытия попапа новой карточки
 newCardAddButton.addEventListener('click', () => {
     openModal(popupNewCard);
+    clearValidation(popupFormProfile, config)
+    toggleButtonState(popupNewCardForm, config)
 });
 
 // Функция наполнения новой карточки на основании попапа
@@ -66,7 +105,7 @@ popupNewCardForm.addEventListener('submit', (element) => {
         name,
         link
     };
-    renderCard(newCardValues, cardsContainer, likeCard, deleteCard);
+    renderCard(newCardValues, cardsContainer, likeCard, deleteCard, userId);
     closeModal(popupNewCard);
     popupNewCardForm.reset();
 })
@@ -80,18 +119,24 @@ const imageOpenPopup = (link, name) => {
 };
 
 // Функция отрисовки новых карточек на страницу
-const renderCard = (item, container, likeCard, deleteCard) => {
-    const cardElement = createCard(item, imageOpenPopup, likeCard, deleteCard);
+const renderCard = (item, container, likeCard, deleteCard, userId) => {
+    const cardElement = createCard(item, imageOpenPopup, likeCard, deleteCard, userId);
     container.prepend(cardElement);
 };
 
 // Функция отрисовки карточкек на страницу
-function renderCards(cardDataList) {
+function renderCards(cardDataList, userId) {
     cardDataList.forEach(function(element) {
-        const cardElement = createCard(element, imageOpenPopup, likeCard, deleteCard);
+        const cardElement = createCard(element, imageOpenPopup, likeCard, deleteCard, userId);
         cardsContainer.append(cardElement);
     });
 };
 
-// Отрисовка изначальных карточек
-renderCards(initialCards);
+Promise.all([getUserInfo(), getCards()])
+    .then (([user, cards]) => {
+        setUserInfo(user);
+        renderCards(cards, user._id)
+    })
+    .catch((err) => {
+        console.log('Ошибка', err);
+    });
