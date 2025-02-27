@@ -1,50 +1,54 @@
 // Темплейт карточки
 const cardsTemplate = document.querySelector('#card-template').content;
 
-// Функция лайка
-  function likeCard(evt) {
-    evt.target.classList.toggle('card__like-button_is-active');
-};
-
 // Функция удаления карточки
 function deleteCard(evt) {
     const cardElement = evt.target.closest('.card');
-    cardElement.remove();
-};
+    if (cardElement) {
+        cardElement.remove();
+    } else {
+        console.error('Card element not found');
+    }
+}
 
 // Функция создания карточки
-function createCard(cardInfo, imageHandler, likeHandler, deleteHandler, userId) {
+function createCard(cardInfo, imageHandler, cardDeleteOnServer, userId, likeHandler) {
     const cardElement = cardsTemplate.querySelector('.card').cloneNode(true);
     const cardDeleteButton = cardElement.querySelector('.card__delete-button');
     const likeButton = cardElement.querySelector('.card__like-button');
     const cardImage = cardElement.querySelector('.card__image');
     const cardLikeCounter = cardElement.querySelector('.card__like-counter');
-    
     cardImage.src = cardInfo.link;
     cardImage.alt = cardInfo.name;
-    cardLikeCounter.textContent = cardInfo.likes.length;
     cardElement.querySelector('.card__title').textContent = cardInfo.name;
+
+    if (cardInfo.likes.some((ures) => ures._id === userId)) {
+        likeButton.classList.add('card__like-button_is-active');
+    }
     
-    likeButton.addEventListener('click', likeHandler);
-    
+    if (cardInfo.likes.length > 0) {
+        cardLikeCounter.textContent = cardInfo.likes.length;
+        cardLikeCounter.classList.remove('card__like-count_hidden');
+    } else {
+        cardLikeCounter.classList.add('card__like-count_hidden');
+    }
+
+    likeButton.addEventListener('click', () => likeHandler(cardInfo._id , likeButton));
+
     if (userId !== cardInfo.owner._id) {
         cardDeleteButton.style.display = 'none';
     } else {
-        cardDeleteButton.addEventListener('click', () => {
-            const cardId = cardInfo._id;
-            deleteHandler(cardElement, cardId);
+        cardDeleteButton.addEventListener('click', (evt) => {
+            deleteCard(evt);
+            cardDeleteOnServer(cardInfo._id);
         });
     }
-    
+
     cardImage.addEventListener('click', () => {
         imageHandler(cardInfo.link, cardInfo.name);
     });
-    
+
     return cardElement;
 }
 
-export {
-    likeCard,
-    deleteCard,
-    createCard
-}
+export {createCard}

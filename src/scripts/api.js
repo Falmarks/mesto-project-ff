@@ -1,7 +1,7 @@
 const config = {
     baseUrl: 'https://nomoreparties.co/v1/wff-cohort-32',
     headers: {
-        authorisation: 'e3aec4e9-3494-45f2-a699-d5ae070bb7af',
+        authorization: 'e3aec4e9-3494-45f2-a699-d5ae070bb7af',
         'Content-Type': 'application/json',
     },
 };
@@ -73,4 +73,12 @@ function getCards() {
     .then(checkResponse);
 }
 
-export {getCards, getUserInfo, deleteCardUser, postNewCard, patchUserInfo, updateUserAvatar};
+// Проверка лайка
+function checkLike(cardId, isLiked) {
+    return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
+         method: isLiked ? "PUT" : "DELETE",
+         headers: config.headers,
+       }).then(checkResponse);
+     }
+
+export {getCards, getUserInfo, deleteCardUser, postNewCard, patchUserInfo, updateUserAvatar, checkLike};

@@ -18,3 +18,11 @@
 .card__like-button:hover {
   opacity: 0.6;
 }
+
+.card__like-counter {
+  font-style: 13px;
+}
+
+.card__like-counter_hidden {
+  display: none;
+}
