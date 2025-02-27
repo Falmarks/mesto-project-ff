@@ -1,9 +1,26 @@
 // Импорты
 import '../pages/index.css';
-import {createCard} from './card';
-import {openModal, closeModal} from './modal';
-import {enableValidation, clearValidation, toggleButtonState} from './validation';
-import {getCards, updateUserAvatar, getUserInfo, deleteCardUser, postNewCard, patchUserInfo, checkLike} from './api';
+import {
+    createCard
+} from './card';
+import {
+    openModal,
+    closeModal
+} from './modal';
+import {
+    enableValidation,
+    clearValidation,
+    toggleButtonState
+} from './validation';
+import {
+    getCards,
+    updateUserAvatar,
+    getUserInfo,
+    deleteCardUser,
+    postNewCard,
+    patchUserInfo,
+    checkLike
+} from './api';
 
 // DOM узлы
 const cardsContainer = document.querySelector('.places__list');
@@ -29,11 +46,11 @@ const config = {
     inactiveButtonClass: 'popup__button_disabled',
     inputErrorClass: 'popup__input_type_error',
     errorClass: 'popup__error_visible'
-  };
+};
 let userId;
 
 // Активация валидирования
-enableValidation(config); 
+enableValidation(config);
 
 // Слушатель + Функция открытия попапа редактирования профиля
 profileEditButton.addEventListener('click', () => {
@@ -44,12 +61,28 @@ profileEditButton.addEventListener('click', () => {
     toggleButtonState(popupFormProfile, config);
 });
 
-// Слушатель открытия формы смены автара
-
+// Слушатель открытия формы изменения аватара
 profileAvatar.addEventListener('click', () => {
     clearValidation(profileAvatarPopup, config)
     openModal(profileAvatarPopup);
-    updateUserAvatar
+    toggleButtonState(profileAvatarPopup, config);
+});
+
+// Функция редактирования аватара
+function handleAvatarFormSubmit(evt, inputAvatar, popupAvatar, profileAvatar) {
+    evt.preventDefault();
+    updateUserAvatar(inputAvatar.value)
+        .then((userData) => {
+            profileAvatar.style.backgroundImage = `url(${userData.avatar})`;
+            closeModal(popupAvatar);
+        })
+        .catch((err) => {
+            console.error(`Ошибка: ${err}`);
+        })
+}
+// Слушатель кнопки редактирования аватара
+formAvatar.addEventListener('submit', (evt) => {
+    handleAvatarFormSubmit(evt, inputAvatar, profileAvatarPopup, profileAvatar);
 });
 
 // Функция идентификации пользователя
@@ -59,7 +92,6 @@ function setUserInfo(user) {
     profileAvatar.setAttribute('style', `background-image: url('${user.avatar}'`);
     userId = user._id;
 };
-
 
 // Слушатель отправки формы попапа редактирования профиля + изменение информации на странице
 popupFormProfile.addEventListener('submit', (element) => {
@@ -87,17 +119,27 @@ newCardAddButton.addEventListener('click', () => {
     toggleButtonState(popupNewCardForm, config)
 });
 
-// Функция наполнения новой карточки на основании попапа
-popupNewCardForm.addEventListener('submit', (element) => {
-    element.preventDefault();
+// Слушатель отрисовки новой карточки
+popupNewCardForm.addEventListener('submit', handleAddCardFormSubmit);
+
+
+//Функция отрисовки новой карточки
+function handleAddCardFormSubmit(evt) {
+    evt.preventDefault();
     const name = popupNewCardForm.elements['place-name'].value;
     const link = popupNewCardForm.elements.link.value;
-    postNewCard(name, link, (newCardInfo) => {
-        renderCard(newCardInfo, userId);
-    });
-    closeModal(popupNewCard);
-    popupNewCardForm.reset();
-});
+    postNewCard(name, link)
+        .then((cardInfo) => {
+            const cardElement = createCard(cardInfo, userId, imageOpenPopup, likeHandler, deleteCardUser);
+            cardsContainer.prepend(cardElement);
+            popupNewCardForm.reset();
+            toggleButtonState(popupNewCardForm, config);
+            closeModal(popupNewCard);
+        })
+        .catch((err) => {
+            console.error(`Ошибка: ${err}`);
+        })
+}
 
 // Функция открытия картинок карточек
 const imageOpenPopup = (link, name) => {
@@ -107,22 +149,16 @@ const imageOpenPopup = (link, name) => {
     openModal(popupImageType);
 };
 
-// Функция отрисовки новых карточек на страницу
-const renderCard = (cardInfo, userId) => {
-    const cardElement = createCard(cardInfo, imageOpenPopup, deleteCardUser, userId, likeHandler);
-    cardsContainer.prepend(cardElement);
-};
-
 // Функция отрисовки карточкек на страницу
 function renderCards(cardDataList, userId) {
     cardDataList.forEach((element) => {
-        const cardElement = createCard(element, imageOpenPopup, deleteCardUser, userId, likeHandler);
+        const cardElement = createCard(element, userId, imageOpenPopup, likeHandler, deleteCardUser);
         cardsContainer.append(cardElement);
     });
 };
 
 Promise.all([getUserInfo(), getCards()])
-    .then (([user, cards]) => {
+    .then(([user, cards]) => {
         setUserInfo(user);
         renderCards(cards, user._id)
     })
@@ -130,15 +166,15 @@ Promise.all([getUserInfo(), getCards()])
         console.log('Ошибка', err);
     });
 
-//Лайк... работай пожалуйста
+//Функция лайка
 function likeHandler(cardId, likeButton) {
     const isLiked = !likeButton.classList.contains('card__like-button_is-active');
-        checkLike(cardId, isLiked)
+    checkLike(cardId, isLiked)
         .then((data) => {
             likeButton.classList.toggle('card__like-button_is-active');
             const cardLikeCount = likeButton
                 .closest('.card')
-                .querySelector('.card__like-count');
+                .querySelector('.card__like-counter');
 
             if (data.likes.length > 0) {
                 cardLikeCount.textContent = data.likes.length;

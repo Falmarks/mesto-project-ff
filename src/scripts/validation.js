@@ -1,5 +1,5 @@
 // Активация и деактивация кнопки
-function toggleButtonState (formElement, config) {
+function toggleButtonState(formElement, config) {
     const inputElements = formElement.querySelectorAll(config.inputSelector);
     const submitButton = formElement.querySelector(config.submitButtonSelector);
     const isFormValid = Array.prototype.every.call(inputElements, (inputElement) => inputElement.checkValidity());
@@ -14,7 +14,7 @@ function toggleButtonState (formElement, config) {
 }
 
 // Отображение сообщений об ошибке
-function showInputError (formElement, inputElement, config) {
+function showInputError(formElement, inputElement, config) {
     const errorElement = formElement.querySelector(`#${inputElement.name}-input-error`);
     inputElement.classList.add(config.inputErrorClass);
 
@@ -27,7 +27,7 @@ function showInputError (formElement, inputElement, config) {
 }
 
 // Скрытие сообщений об ощибке
-function hideInputError (formElement, inputElement, config) {
+function hideInputError(formElement, inputElement, config) {
     const errorElement = formElement.querySelector(`#${inputElement.name}-input-error`);
     inputElement.classList.remove(config.inputErrorClass);
     errorElement.classList.remove(config.errorClass);
@@ -41,12 +41,12 @@ function enableValidation(config) {
         const inputElements = formElement.querySelectorAll(config.inputSelector);
         inputElements.forEach((inputElement) => {
             inputElement.addEventListener('input', () => {
-            if (!inputElement.checkValidity()) {
-                showInputError(formElement, inputElement, config);
-            } else {
-                hideInputError(formElement, inputElement, config);
-            }
-            toggleButtonState(formElement, config);
+                if (!inputElement.checkValidity()) {
+                    showInputError(formElement, inputElement, config);
+                } else {
+                    hideInputError(formElement, inputElement, config);
+                }
+                toggleButtonState(formElement, config);
             });
         })
     });
@@ -60,4 +60,8 @@ function clearValidation(formElement, config) {
     });
 }
 
-export {enableValidation, clearValidation, toggleButtonState};
+export {
+    enableValidation,
+    clearValidation,
+    toggleButtonState
+};

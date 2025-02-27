@@ -12,7 +12,7 @@ function deleteCard(evt) {
 }
 
 // Функция создания карточки
-function createCard(cardInfo, imageHandler, cardDeleteOnServer, userId, likeHandler) {
+function createCard(cardInfo, userId, imageHandler, likeHandler, cardDeleteOnServer) {
     const cardElement = cardsTemplate.querySelector('.card').cloneNode(true);
     const cardDeleteButton = cardElement.querySelector('.card__delete-button');
     const likeButton = cardElement.querySelector('.card__like-button');
@@ -25,7 +25,7 @@ function createCard(cardInfo, imageHandler, cardDeleteOnServer, userId, likeHand
     if (cardInfo.likes.some((ures) => ures._id === userId)) {
         likeButton.classList.add('card__like-button_is-active');
     }
-    
+
     if (cardInfo.likes.length > 0) {
         cardLikeCounter.textContent = cardInfo.likes.length;
         cardLikeCounter.classList.remove('card__like-count_hidden');
@@ -33,7 +33,7 @@ function createCard(cardInfo, imageHandler, cardDeleteOnServer, userId, likeHand
         cardLikeCounter.classList.add('card__like-count_hidden');
     }
 
-    likeButton.addEventListener('click', () => likeHandler(cardInfo._id , likeButton));
+    likeButton.addEventListener('click', () => likeHandler(cardInfo._id, likeButton));
 
     if (userId !== cardInfo.owner._id) {
         cardDeleteButton.style.display = 'none';
@@ -51,4 +51,6 @@ function createCard(cardInfo, imageHandler, cardDeleteOnServer, userId, likeHand
     return cardElement;
 }
 
-export {createCard}
+export {
+    createCard
+}
