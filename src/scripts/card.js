@@ -39,7 +39,6 @@ function createCard(cardInfo, userId, imageHandler, likeHandler, cardDeleteOnSer
         cardDeleteButton.style.display = 'none';
     } else {
         cardDeleteButton.addEventListener('click', (evt) => {
-            deleteCard(evt);
             cardDeleteOnServer(cardInfo._id);
         });
     }
