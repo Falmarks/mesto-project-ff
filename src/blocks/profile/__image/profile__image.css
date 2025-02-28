@@ -7,6 +7,21 @@
   background-size: cover;
   background-position: center;
   margin: 0 29px 0 0;
+  position: relative;
+}
+
+.profile__image:hover::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  background-image: url("../../../images/pencil-avatar.svg");
+  background-color: rgba(0, 0, 0, 0.8);
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
 }
 
 @media screen and (max-width: 740px) {

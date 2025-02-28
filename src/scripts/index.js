@@ -49,6 +49,15 @@ const config = {
 };
 let userId;
 
+// Функция ожидания
+function renderLoading(isLoading, button, buttonText = 'Сохранить', loadingText = 'Сохранение...') {
+    if (isLoading) {
+        button.textContent = loadingText;
+    } else {
+        button.textContent = buttonText;
+    }
+}
+
 // Активация валидирования
 enableValidation(config);
 
@@ -58,19 +67,19 @@ profileEditButton.addEventListener('click', () => {
     popupFormProfile.name.value = profileTitle.textContent;
     popupFormProfile.description.value = profileDescription.textContent;
     openModal(popupEditProfile);
-    toggleButtonState(popupFormProfile, config);
 });
 
 // Слушатель открытия формы изменения аватара
 profileAvatar.addEventListener('click', () => {
     clearValidation(profileAvatarPopup, config)
     openModal(profileAvatarPopup);
-    toggleButtonState(profileAvatarPopup, config);
 });
 
 // Функция редактирования аватара
 function handleAvatarFormSubmit(evt, inputAvatar, popupAvatar, profileAvatar) {
     evt.preventDefault();
+    const submitButton = evt.submitter;
+    renderLoading(true, submitButton);
     updateUserAvatar(inputAvatar.value)
         .then((userData) => {
             profileAvatar.style.backgroundImage = `url(${userData.avatar})`;
@@ -79,6 +88,9 @@ function handleAvatarFormSubmit(evt, inputAvatar, popupAvatar, profileAvatar) {
         .catch((err) => {
             console.error(`Ошибка: ${err}`);
         })
+        .finally(() => {
+            renderLoading(false, submitButton);
+        });
 }
 // Слушатель кнопки редактирования аватара
 formAvatar.addEventListener('submit', (evt) => {
@@ -94,8 +106,10 @@ function setUserInfo(user) {
 };
 
 // Слушатель отправки формы попапа редактирования профиля + изменение информации на странице
-popupFormProfile.addEventListener('submit', (element) => {
-    element.preventDefault();
+popupFormProfile.addEventListener('submit', (evt) => {
+    evt.preventDefault();
+    const submitButton = evt.submitter;
+    renderLoading(true, submitButton);
     profileTitle.textContent = popupFormProfile.elements.name.value;
     profileDescription.textContent = popupFormProfile.elements.description.value;
     patchUserInfo(profileTitle.textContent, profileDescription.textContent);
@@ -116,7 +130,6 @@ modals.forEach((modal) => {
 newCardAddButton.addEventListener('click', () => {
     openModal(popupNewCard);
     clearValidation(popupFormProfile, config)
-    toggleButtonState(popupNewCardForm, config)
 });
 
 // Слушатель отрисовки новой карточки

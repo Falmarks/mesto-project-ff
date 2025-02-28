@@ -1,3 +1,9 @@
+// Функция отключения кнопки отправки формы
+const disableSubmitButton = (submitButton, config) => {
+    submitButton.disabled = true;
+    submitButton.classList.add(config.inactiveButtonClass);
+};
+
 // Активация и деактивация кнопки
 function toggleButtonState(formElement, config) {
     const inputElements = formElement.querySelectorAll(config.inputSelector);
@@ -8,8 +14,7 @@ function toggleButtonState(formElement, config) {
         submitButton.disabled = false;
         submitButton.classList.remove(config.inactiveButtonClass);
     } else {
-        submitButton.disabled = true;
-        submitButton.classList.add(config.inactiveButtonClass);
+        disableSubmitButton(submitButton, config); 
     }
 }
 
@@ -57,6 +62,8 @@ function clearValidation(formElement, config) {
     const inputElements = formElement.querySelectorAll(config.inputSelector);
     inputElements.forEach((inputElement) => {
         hideInputError(formElement, inputElement, config);
+        const submitButton = formElement.querySelector(config.submitButtonSelector);
+        disableSubmitButton(submitButton, config);
     });
 }
 
